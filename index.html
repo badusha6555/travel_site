@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: #f9fada;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      .destinations-section {
+        /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+        padding: 80px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .card {
+        position: relative;
+        width: 350px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 24px;
+        padding: 0;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1),
+          0 8px 32px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.6),
+          inset 0 -1px 0 rgba(0, 0, 0, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        overflow: hidden;
+        transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        cursor: pointer;
+      }
+
+      .card:hover {
+        transform: translateY(-12px) rotateX(5deg) rotateY(2deg);
+        box-shadow: 0 35px 60px rgba(0, 0, 0, 0.15),
+          0 15px 45px rgba(0, 0, 0, 0.08),
+          inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #ff6b6b, #feca57, #48cae4, #f093fb);
+        background-size: 200% 100%;
+        animation: shimmer 3s infinite;
+      }
+
+      @keyframes shimmer {
+        0% {
+          background-position: -200% 0;
+        }
+        100% {
+          background-position: 200% 0;
+        }
+      }
+
+      .image-container {
+        position: relative;
+        height: 220px;
+        overflow: hidden;
+        border-radius: 20px 20px 0 0;
+      }
+
+      .card-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        filter: brightness(0.9) contrast(1.1) saturate(1.2);
+        background: linear-gradient(135deg, #48cae4 0%, #f093fb 100%);
+      }
+
+      .card:hover .card-image {
+        transform: scale(1.08) rotate(1deg);
+        filter: brightness(1) contrast(1.2) saturate(1.3);
+      }
+
+      .image-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 107, 107, 0.1) 0%,
+          rgba(72, 202, 228, 0.1) 50%,
+          rgba(240, 147, 251, 0.1) 100%
+        );
+        opacity: 0;
+        transition: opacity 0.4s ease;
+      }
+
+      .card:hover .image-overlay {
+        opacity: 1;
+      }
+
+      .favorite-btn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+      }
+
+      .favorite-btn:hover {
+        background: rgba(255, 255, 255, 1);
+        transform: scale(1.1);
+      }
+
+      .favorite-btn i {
+        color: #ff6b6b;
+        font-size: 18px;
+        transition: all 0.3s ease;
+      }
+
+      .favorite-btn:hover i {
+        animation: pulse 0.6s ease;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.3);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .rating-badge {
+        position: absolute;
+        bottom: 15px;
+        left: 15px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        backdrop-filter: blur(10px);
+      }
+
+      .card-content {
+        padding: 25px;
+      }
+
+      .location-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .location-icon {
+        color: #ff6b6b;
+        font-size: 16px;
+      }
+
+      .card-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin: 0;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .card-description {
+        color: #666;
+        font-size: 15px;
+        line-height: 1.6;
+        margin: 15px 0 20px 0;
+        font-weight: 400;
+      }
+
+      .card-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .explore-btn {
+        flex: 1;
+        background: linear-gradient(135deg, #7dffc5 0%, #80ef80 100%);
+        color: white;
+        border: none;
+        padding: 14px 24px;
+        border-radius: 16px;
+        font-weight: 600;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .explore-btn:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s;
+      }
+
+      .explore-btn:hover:before {
+        left: 100%;
+      }
+
+      .explore-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(102, 126, 234, 0.4);
+      }
+
+      .share-btn {
+        width: 48px;
+        height: 48px;
+        background: rgba(102, 126, 234, 0.1);
+        border: 2px solid rgba(102, 126, 234, 0.2);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .share-btn:hover {
+        background: rgba(102, 126, 234, 0.2);
+        border-color: rgba(102, 126, 234, 0.4);
+        transform: scale(1.05);
+      }
+
+      .share-btn i {
+        color: #667eea;
+        font-size: 18px;
+      }
+
+      .floating-elements {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      .floating-element {
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border-radius: 50%;
+        opacity: 0;
+        animation: float 4s infinite;
+      }
+
+      .floating-element:nth-child(1) {
+        top: 20%;
+        left: 10%;
+        animation-delay: 0s;
+      }
+
+      .floating-element:nth-child(2) {
+        top: 60%;
+        right: 15%;
+        animation-delay: 1s;
+      }
+
+      .floating-element:nth-child(3) {
+        bottom: 30%;
+        left: 20%;
+        animation-delay: 2s;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          opacity: 0;
+          transform: translateY(0) scale(0);
+        }
+        50% {
+          opacity: 0.6;
+          transform: translateY(-20px) scale(1);
+        }
+      }
+
+      .card:hover .floating-element {
+        animation-duration: 2s;
+      }
+
+      .destinations-header {
+        text-align: center;
+        margin-bottom: 60px;
+      }
+
+      .destinations-title {
+        font-size: 3rem;
+        font-weight: 800;
+        color: white;
+        margin-bottom: 16px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .destinations-subtitle {
+        font-size: 1.2rem;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 400;
+      }
+
+      .destinations-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        max-width: 1200px;
+        width: 100%;
+      }
+
+      @media (max-width: 480px) {
+        .card {
+          width: 100%;
+          max-width: 320px;
+        }
+
+        .destinations-title {
+          font-size: 2rem;
+        }
+
+        .destinations-subtitle {
+          font-size: 1rem;
+        }
+      }
+    </style>
+    <title>SSS Tours and Travels</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon" />
+
+    <!-- Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700;900&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <!-- AOS Library -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css"
+    />
+
+    <style>
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: "Plus Jakarta Sans", "Noto Sans", sans-serif;
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
+  </head>
+  <body class="bg-[#f9fada]">
+    <!-- Header -->
+    <header
+      id="mainHeader"
+      class="sticky top-0 z-50 flex items-center justify-between border-b border-[#f3ede7] px-10 py-4 bg-[#f9fada] backdrop-blur-md shadow-sm transition-all duration-500"
+    >
+      <div class="flex items-center gap-4 text-[#1b140e]">
+        <div class="w-14 h-14 shrink-0">
+          <img
+            src="images/Logo Bg_Removed.png"
+            alt="Logo"
+            class="w-full h-full object-cover"
+          />
+        </div>
+        <h2 class="text-xl font-bold text-[#173317]">SSS Tours and Travels</h2>
+      </div>
+      <nav class="flex items-center gap-9">
+        <a href="#destinations" class="text-sm font-medium text-[#1b140e]"
+          >Destinations</a
+        >
+        <a href="services.html" class="text-sm font-medium text-[#1b140e]"
+          >Our Services</a
+        >
+        <a
+          href="about.html"
+          class="text-sm font-medium text-[#1b140e] hover:text-[#80EF80] transition-colors"
+          >About Us</a
+        >
+        <a href="#contact" class="text-sm font-medium text-[#1b140e]"
+          >Contact</a
+        >
+        <button
+          class="h-10 px-4 bg-[#80EF80] text-[#173317] font-bold rounded-full hover:bg-[#73d973] transition-colors"
+        >
+          Book Now
+        </button>
+      </nav>
+    </header>
+
+    <!-- Hero Section with Swiper -->
+    <!-- In your <head> (make sure this is present and only once) -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
+
+    <!-- Hero Section -->
+    <section class="relative h-[90vh] w-full overflow-hidden">
+      <div class="swiper heroSwiper h-full">
+        <div class="swiper-wrapper">
+          <!-- Slide 1 -->
+          <div
+            class="swiper-slide flex h-full flex-col justify-center items-center text-center px-6"
+            data-header-bg="url('images/Thailand1.jpg')"
+            style="
+              background-image: linear-gradient(
+                  rgba(0, 0, 0, 0.3),
+                  rgba(0, 0, 0, 0.5)
+                ),
+                url('images/Pattay.jpg');
+              background-size: cover;
+              background-position: center;
+            "
+          >
+            <div
+              class="w-full flex flex-col items-center justify-center h-full"
+            >
+              <h1
+                class="text-4xl sm:text-5xl text-white font-black leading-tight"
+                data-aos="zoom-in"
+              >
+                Explore Pattaya with <br /><span class="text-[#80EF80]"
+                  >SSS Tours and Travels</span
+                >
+              </h1>
+              <p
+                class="text-white text-base sm:text-lg mt-3"
+                data-aos="fade-up"
+              >
+                Discover curated tours and travel experiences to make your dream
+                vacation a reality.
+              </p>
+              <button
+                class="mt-6 h-12 px-6 bg-[#80EF80] text-[#173317] font-bold rounded-full hover:bg-[#73d973] transition-all duration-300 transform hover:scale-105"
+                data-aos="fade-up"
+                data-aos-delay="200"
+              >
+                Book Your Adventure
+              </button>
+            </div>
+          </div>
+          <!-- Slide 2 -->
+          <div
+            class="swiper-slide flex flex-col justify-center items-center text-center px-6"
+            data-header-bg="url('images/Bangkok.jpg')"
+            style="
+              background-image: linear-gradient(
+                  rgba(0, 0, 0, 0.3),
+                  rgba(0, 0, 0, 0.5)
+                ),
+                url('images/Phuket.jpg');
+              background-size: cover;
+              background-position: center;
+            "
+          >
+            <div
+              class="w-full flex flex-col items-center justify-center h-full"
+            >
+              <h1
+                class="text-4xl sm:text-5xl text-white font-black leading-tight"
+                data-aos="zoom-in"
+              >
+                Explore Phuket with <br /><span class="text-[#80EF80]"
+                  >SSS Tours and Travels</span
+                >
+              </h1>
+              <p
+                class="text-white text-base sm:text-lg mt-3"
+                data-aos="fade-up"
+              >
+                Discover curated tours and travel experiences to make your dream
+                vacation a reality.
+              </p>
+              <button
+                class="mt-6 h-12 px-6 bg-[#80EF80] text-[#173317] font-bold rounded-full hover:bg-[#73d973] transition-all duration-300 transform hover:scale-105"
+                data-aos="fade-up"
+                data-aos-delay="200"
+              >
+                Book Your Adventure
+              </button>
+            </div>
+          </div>
+          <!-- Slide 3 -->
+          <div
+            class="swiper-slide flex flex-col justify-center items-center text-center px-6"
+            data-header-bg="url('images/Phuket.jpg')"
+            style="
+              background-image: linear-gradient(
+                  rgba(0, 0, 0, 0.3),
+                  rgba(0, 0, 0, 0.5)
+                ),
+                url('images/Krabi.jpg');
+              background-size: cover;
+              background-position: center;
+            "
+          >
+            <div
+              class="w-full flex flex-col items-center justify-center h-full"
+            >
+              <h1
+                class="text-4xl sm:text-5xl text-white font-black leading-tight"
+                data-aos="zoom-in"
+              >
+                Explore Krabi with <br /><span class="text-[#80EF80]"
+                  >SSS Tours and Travels</span
+                >
+              </h1>
+              <p
+                class="text-white text-base sm:text-lg mt-3"
+                data-aos="fade-up"
+              >
+                Discover curated tours and travel experiences to make your dream
+                vacation a reality.
+              </p>
+              <button
+                class="mt-6 h-12 px-6 bg-[#80EF80] text-[#173317] font-bold rounded-full hover:bg-[#73d973] transition-all duration-300 transform hover:scale-105"
+                data-aos="fade-up"
+                data-aos-delay="200"
+              >
+                Book Your Adventure
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="swiper-pagination bottom-4"></div>
+      </div>
+    </section>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+      // Swiper initialization
+      const swiper = new Swiper(".heroSwiper", {
+        loop: true,
+        effect: "fade",
+        autoplay: { delay: 5000, disableOnInteraction: false },
+        pagination: { el: ".swiper-pagination", clickable: true },
+        on: {
+          slideChange: function () {
+            const activeSlide = document.querySelector(
+              ".heroSwiper .swiper-slide-active"
+            );
+            const header = document.getElementById("mainHeader");
+            if (activeSlide && header) {
+              const bg = activeSlide.getAttribute("data-header-bg");
+              header.style.backgroundImage = bg
+                ? `linear-gradient(rgba(249,250,218,0.95),rgba(249,250,218,0.95)),${bg}`
+                : "";
+            }
+          },
+        },
+      });
+
+      // Set initial header background on load
+      window.addEventListener("DOMContentLoaded", () => {
+        const activeSlide = document.querySelector(
+          ".heroSwiper .swiper-slide-active"
+        );
+        const header = document.getElementById("mainHeader");
+        if (activeSlide && header) {
+          const bg = activeSlide.getAttribute("data-header-bg");
+          header.style.backgroundImage = bg
+            ? `linear-gradient(rgba(249,250,218,0.95),rgba(249,250,218,0.95)),${bg}`
+            : "";
+        }
+      });
+    </script>
+
+    <!-- Featured Destinations -->
+    <section id="destinations" class="destinations-section">
+      <div class="destinations-content">
+        <div class="destinations-header" data-aos="fade-up">
+          <h2 class="destinations-title">Featured Destinations</h2>
+          <p class="destinations-subtitle">
+            Discover our handpicked travel experiences
+          </p>
+        </div>
+
+        <div
+          class="cards-grid"
+          style="
+            display: flex;
+            gap: 32px;
+            flex-wrap: wrap;
+            justify-content: center;
+          "
+        >
+          <!-- Card 1 -->
+          <div
+            class="card"
+            onclick="handleCardClick()"
+            data-aos="zoom-in"
+            data-aos-delay="300"
+          >
+            <div class="floating-elements">
+              <div class="floating-element"></div>
+              <div class="floating-element"></div>
+              <div class="floating-element"></div>
+            </div>
+            <div class="image-container">
+              <div
+                class="card-image"
+                style="
+                  background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+                  background-size: cover;
+                  background-position: center;
+                "
+              ></div>
+              <div class="image-overlay"></div>
+              <button class="favorite-btn" onclick="toggleFavorite(event)">
+                <i id="heartIcon" class="far fa-heart"></i>
+              </button>
+              <div class="rating-badge">
+                <i class="fas fa-star" style="color: #feca57"></i>
+                <span>4.8</span>
+              </div>
+            </div>
+            <div class="card-content">
+              <div class="location-header">
+                <i class="fas fa-map-marker-alt location-icon"></i>
+                <h3 class="card-title">Bangkok, Thailand</h3>
+              </div>
+              <p class="card-description">
+                The dynamic capital city offers a perfect blend of ancient
+                temples, bustling street life, and modern attractions. Explore
+                the Grand Palace, floating markets, and vibrant nightlife.
+              </p>
+              <div class="card-actions">
+                <button class="explore-btn" onclick="exploreDestination(event)">
+                  Explore Now
+                </button>
+                <button class="share-btn" onclick="shareDestination(event)">
+                  <i class="fas fa-share-alt"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- Card 2 -->
+          <div
+            class="card"
+            onclick="handleCardClick()"
+            data-aos="zoom-in"
+            data-aos-delay="350"
+          >
+            <div class="floating-elements">
+              <div class="floating-element"></div>
+              <div class="floating-element"></div>
+              <div class="floating-element"></div>
+            </div>
+            <div class="image-container">
+              <div
+                class="card-image"
+                style="
+                  background-image: url('https://images.unsplash.com/photo-1465156799763-2c087c332922?auto=format&fit=crop&w=800&q=80');
+                  background-size: cover;
+                  background-position: center;
+                "
+              ></div>
+              <div class="image-overlay"></div>
+              <button class="favorite-btn" onclick="toggleFavorite(event)">
+                <i class="far fa-heart"></i>
+              </button>
+              <div class="rating-badge">
+                <i class="fas fa-star" style="color: #feca57"></i>
+                <span>4.7</span>
+              </div>
+            </div>
+            <div class="card-content">
+              <div class="location-header">
+                <i class="fas fa-map-marker-alt location-icon"></i>
+                <h3 class="card-title">Phuket, Thailand</h3>
+              </div>
+              <p class="card-description">
+                Famous for its stunning beaches, vibrant nightlife, and water
+                adventures. Relax on Patong Beach or explore the Phi Phi
+                Islands.
+              </p>
+              <div class="card-actions">
+                <button class="explore-btn" onclick="exploreDestination(event)">
+                  Explore Now
+                </button>
+                <button class="share-btn" onclick="shareDestination(event)">
+                  <i class="fas fa-share-alt"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- Card 3 -->
+          <div
+            class="card"
+            onclick="handleCardClick()"
+            data-aos="zoom-in"
+            data-aos-delay="400"
+          >
+            <div class="floating-elements">
+              <div class="floating-element"></div>
+              <div class="floating-element"></div>
+              <div class="floating-element"></div>
+            </div>
+            <div class="image-container">
+              <div
+                class="card-image"
+                style="
+                  background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80');
+                  background-size: cover;
+                  background-position: center;
+                "
+              ></div>
+              <div class="image-overlay"></div>
+              <button class="favorite-btn" onclick="toggleFavorite(event)">
+                <i class="far fa-heart"></i>
+              </button>
+              <div class="rating-badge">
+                <i class="fas fa-star" style="color: #feca57"></i>
+                <span>4.9</span>
+              </div>
+            </div>
+            <div class="card-content">
+              <div class="location-header">
+                <i class="fas fa-map-marker-alt location-icon"></i>
+                <h3 class="card-title">Krabi, Thailand</h3>
+              </div>
+              <p class="card-description">
+                Known for dramatic limestone cliffs, clear waters, and beautiful
+                islands. Visit Railay Beach and the Emerald Pool.
+              </p>
+              <div class="card-actions">
+                <button class="explore-btn" onclick="exploreDestination(event)">
+                  Explore Now
+                </button>
+                <button class="share-btn" onclick="shareDestination(event)">
+                  <i class="fas fa-share-alt"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Us -->
+    <section
+      id="about"
+      class="px-6 py-10 bg-[#fcfaf8] text-center"
+      data-aos="fade-up"
+    >
+      <h2 class="text-2xl font-bold text-[#1b140e] mb-4">About Us</h2>
+      <p class="text-[#97734e] max-w-2xl mx-auto">
+        SSS Tours and Travels is committed to offering quality tour packages,
+        crafted for unforgettable experiences. We provide personalized service,
+        handpicked destinations, and 24/7 support to make your travel
+        worry-free.
+      </p>
+    </section>
+
+    <!-- Services -->
+    <section
+      id="services"
+      class="px-6 py-10 max-w-6xl mx-auto"
+      data-aos="fade-up"
+    >
+      <h2 class="text-2xl font-bold text-[#1b140e] mb-6">Our Services</h2>
+      <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+        <div
+          class="bg-white shadow rounded-xl p-4 hover:shadow-lg transition-shadow"
+        >
+          <div
+            class="w-12 h-12 bg-[#80EF80] rounded-lg flex items-center justify-center mb-3"
+          >
+            <i class="fas fa-plane text-[#173317] text-xl"></i>
+          </div>
+          <h3 class="text-[#1b140e] font-semibold">Flight Bookings</h3>
+          <p class="text-[#97734e]">
+            Seamless domestic and international flight arrangements.
+          </p>
+        </div>
+        <div
+          class="bg-white shadow rounded-xl p-4 hover:shadow-lg transition-shadow"
+        >
+          <div
+            class="w-12 h-12 bg-[#80EF80] rounded-lg flex items-center justify-center mb-3"
+          >
+            <i class="fas fa-hotel text-[#173317] text-xl"></i>
+          </div>
+          <h3 class="text-[#1b140e] font-semibold">Hotel Reservations</h3>
+          <p class="text-[#97734e]">
+            Best-rated hotels to suit every budget and style.
+          </p>
+        </div>
+        <div
+          class="bg-white shadow rounded-xl p-4 hover:shadow-lg transition-shadow"
+        >
+          <div
+            class="w-12 h-12 bg-[#80EF80] rounded-lg flex items-center justify-center mb-3"
+          >
+            <i class="fas fa-route text-[#173317] text-xl"></i>
+          </div>
+          <h3 class="text-[#1b140e] font-semibold">Custom Itineraries</h3>
+          <p class="text-[#97734e]">
+            Tailor-made trips built around your preferences.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Us -->
+    <section id="contact" class="px-6 py-10 bg-[#fcfaf8]" data-aos="fade-up">
+      <h2 class="text-2xl font-bold text-[#1b140e] text-center mb-6">
+        Contact Us
+      </h2>
+      <form class="max-w-2xl mx-auto grid gap-4">
+        <input
+          type="text"
+          placeholder="Name"
+          class="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#80EF80] focus:border-transparent"
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          class="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#80EF80] focus:border-transparent"
+        />
+        <textarea
+          placeholder="Message"
+          rows="4"
+          class="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#80EF80] focus:border-transparent"
+        ></textarea>
+        <button
+          type="submit"
+          class="bg-[#80EF80] text-[#173317] font-bold py-2 px-6 rounded-full w-fit mx-auto hover:bg-[#73d973] transition-colors"
+        >
+          Send Message
+        </button>
+      </form>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center text-[#97734e] text-sm py-6 bg-[#f3ede7]">
+      <div class="flex justify-center items-center gap-4 mb-2">
+        <i class="fas fa-phone text-[#80EF80]"></i>
+        <span>+1 (555) 123-4567</span>
+        <i class="fas fa-envelope text-[#80EF80]"></i>
+        <span>info@ssstours.com</span>
+      </div>
+      &copy; 2024 SSS Tours and Travels. All rights reserved.
+    </footer>
+
+    <!-- AOS Script -->
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>
+      AOS.init({
+        duration: 1000,
+        once: true,
+        easing: "ease-in-out",
+      });
+    </script>
+    <script>
+      let isFavorite = false;
+
+      function toggleFavorite(event) {
+        event.stopPropagation();
+        const heartIcon = document.getElementById("heartIcon");
+        isFavorite = !isFavorite;
+
+        if (isFavorite) {
+          heartIcon.className = "fas fa-heart";
+          heartIcon.style.color = "#ff6b6b";
+        } else {
+          heartIcon.className = "far fa-heart";
+          heartIcon.style.color = "#ff6b6b";
+        }
+      }
+
+      function exploreDestination(event) {
+        event.stopPropagation();
+        event.target.style.transform = "scale(0.95)";
+        setTimeout(() => {
+          event.target.style.transform = "translateY(-2px)";
+        }, 100);
+
+        alert("Exploring Bangkok! 🏛️ Get ready for an amazing adventure!");
+      }
+
+      function shareDestination(event) {
+        event.stopPropagation();
+        if (navigator.share) {
+          navigator.share({
+            title: "Bangkok, Thailand",
+            text: "Check out this amazing destination in Bangkok!",
+            url: window.location.href,
+          });
+        } else {
+          alert("Sharing Bangkok destination! 📱");
+        }
+      }
+
+      function handleCardClick() {
+        console.log("Card clicked - could navigate to detailed view");
+      }
+
+      // Add interactive sparkle effect on mouse movement
+      document.addEventListener("mousemove", (e) => {
+        const card = document.querySelector(".card");
+        if (!card) return;
+
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          const rotateX = (y - centerY) / 10;
+          const rotateY = (centerX - x) / 10;
+
+          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(20px)`;
+        }
+      });
+
+      document.addEventListener("mouseleave", () => {
+        const card = document.querySelector(".card");
+        if (card) {
+          card.style.transform =
+            "perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)";
+        }
+      });
+    </script>
+  </body>
+</html>
